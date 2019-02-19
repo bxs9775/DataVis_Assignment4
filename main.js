@@ -15,7 +15,7 @@ var yAxisOff = 20; //based on the width of the <g> element
 let xMinPad = yAxisOff;
 let yMinPad = xAxisOff;
 let xMaxPad = 10;
-let yMaxPad = 2.5;
+let yMaxPad = 4;
 
 let numDaysSlider = document.querySelector("#numDaysSlider");
 let daysText = document.querySelector("#daysText");
@@ -30,6 +30,11 @@ let key = (d) => d.date;  // put code here for key function to join data to visu
 
 let minDate = (data) => d3.min(data,(d) => d.date);
 let maxDate = (data) => d3.timeDay.offset(d3.max(data,(d) => d.date),1);
+
+//Reusable function for bar width
+function barWidth(numBars){
+  return (w-(xMinPad+xMaxPad))/numBars;
+}
 
 function rowConverter(d) {
   // put code here for row conversion
@@ -57,10 +62,10 @@ function initGraph() {
     //Create scales
     xScale = d3.scaleTime()
       .domain([minDate(dataset),maxDate(dataset)])
-      .range([xMinPad,w-xMaxPad]); //Note: add padding?
+      .range([xMinPad,w-xMaxPad]);
     yScale = d3.scaleLinear()
       .domain([0,12])
-      .range([h-yMinPad-yMaxPad,0]); //Note: add padding?
+      .range([h-(yMinPad+yMaxPad),0]);
     cScale = d3.scaleLinear()
       .domain([0,12])
       .range(['red','orange']);
@@ -78,9 +83,9 @@ function initGraph() {
       .enter()
       .append('rect')
       .attr('x',(d) => xScale(d.date))
-      .attr('y',(d) => yScale(d.hours_of_sleep)-yMinPad+yMaxPad)
+      .attr('y',(d) => yScale(d.hours_of_sleep)-yMinPad)
       //.attr('y',yMinPad)
-      .attr('width',w/defaultNum)
+      .attr('width',barWidth(defaultNum))
       .attr('height',(d) => h-yScale(d.hours_of_sleep))
       .attr('fill',(d) => cScale(d.hours_of_sleep));
     
@@ -91,7 +96,7 @@ function initGraph() {
     //Display axis
     xAxisGroup = svg.append('g')
       .attr('class','axis')
-      .attr('transform',`translate(0,${h-xAxisOff+yMaxPad})`)
+      .attr('transform',`translate(0,${h-xAxisOff})`)
       .call(xAxis);
     yAxisGroup = svg.append('g')
       .attr('class','axis')
@@ -108,8 +113,6 @@ function updateGraph() {
   console.dir(dataset);
   console.dir(newData);
   
-  var barWidth = w/numDays;
-  
   //Update scales
   xScale.domain([minDate(newData),maxDate(newData)]);
   
@@ -118,7 +121,7 @@ function updateGraph() {
     .data(newData,key);
   bars.enter()
     .append('rect')
-    .attr('x',(d) => -1*barWidth)
+    .attr('x',(d) => -1*barWidth(numDays))
     .attr('y',(d) => h - yScale(d.hours_of_sleep)-yMinPad)
     .attr('height',(d) => yScale(d.hours_of_sleep))
     .attr('fill',(d) => cScale(d.hours_of_sleep))
@@ -126,11 +129,11 @@ function updateGraph() {
     .transition('barsIn')
     .duration(500)
     .attr('x',(d) => xScale(d.date))
-    .attr('width',barWidth);
+    .attr('width',barWidth(numDays));
   bars.exit()
     .transition('barsOut')
     .duration(500)
-    .attr('x',(d) => -1*barWidth)
+    .attr('x',(d) => -1*barWidth(numDays))
     .remove();
   
   xAxisGroup
