@@ -73,18 +73,12 @@ function initGraph() {
     var defaultNum = 7;
     //Create bars
     svg
-    /* I don't know why this doesn't work...
-      .append('g')
-      .attr('class','bars')
-      .attr('transform',`scale(1,-1) tanslate(0,${h})`)
-    */
       .selectAll('rect')
       .data(dataset,key)
       .enter()
       .append('rect')
       .attr('x',(d) => xScale(d.date))
       .attr('y',(d) => yScale(d.hours_of_sleep)-yMinPad)
-      //.attr('y',yMinPad)
       .attr('width',barWidth(defaultNum))
       .attr('height',(d) => h-yScale(d.hours_of_sleep))
       .attr('fill',(d) => cScale(d.hours_of_sleep));
@@ -110,8 +104,6 @@ function updateGraph() {
   daysText.innerText = numDays;
   
   var newData = dataset.slice(7-numDays,7);
-  console.dir(dataset);
-  console.dir(newData);
   
   //Update scales
   xScale.domain([minDate(newData),maxDate(newData)]);
