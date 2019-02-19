@@ -11,14 +11,18 @@ let daysText = document.querySelector("#daysText");
 
 let dataURL = "data.csv";
 
-let parseDate; // put code here for d3 date parsing  
+let parseDate = d3.timeParse('%Y-%m-%d'); // put code here for d3 date parsing  
 
 let goodSleep = 7.5;
 
-let key;  // put code here for key function to join data to visual elements 
+let key = (d) => d.date;  // put code here for key function to join data to visual elements 
 
 function rowConverter(d) {
   // put code here for row conversion
+  return{
+    date: parseDate(d.date),
+    hours_of_sleep: parseFloat(d.hours_of_sleep)
+  };
 }
 
 function initGraph() {
