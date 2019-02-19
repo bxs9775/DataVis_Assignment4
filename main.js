@@ -14,6 +14,8 @@ var yAxisOff = 20; //based on the width of the <g> element
 //padding
 let xMinPad = yAxisOff;
 let yMinPad = xAxisOff;
+let xMaxPad = 10;
+let yMaxPad = 2.5;
 
 let numDaysSlider = document.querySelector("#numDaysSlider");
 let daysText = document.querySelector("#daysText");
@@ -55,10 +57,10 @@ function initGraph() {
     //Create scales
     xScale = d3.scaleTime()
       .domain([minDate(dataset),maxDate(dataset)])
-      .range([xMinPad,w]); //Note: add padding?
+      .range([xMinPad,w-xMaxPad]); //Note: add padding?
     yScale = d3.scaleLinear()
       .domain([0,12])
-      .range([0,h-yMinPad]); //Note: add padding?
+      .range([h-yMinPad-yMaxPad,0]); //Note: add padding?
     cScale = d3.scaleLinear()
       .domain([0,12])
       .range(['red','orange']);
@@ -76,10 +78,10 @@ function initGraph() {
       .enter()
       .append('rect')
       .attr('x',(d) => xScale(d.date))
-      .attr('y',(d) => h - yScale(d.hours_of_sleep)-yMinPad)
+      .attr('y',(d) => yScale(d.hours_of_sleep)-yMinPad+yMaxPad)
       //.attr('y',yMinPad)
       .attr('width',w/defaultNum)
-      .attr('height',(d) => yScale(d.hours_of_sleep))
+      .attr('height',(d) => h-yScale(d.hours_of_sleep))
       .attr('fill',(d) => cScale(d.hours_of_sleep));
     
     //Create axes
@@ -89,11 +91,11 @@ function initGraph() {
     //Display axis
     xAxisGroup = svg.append('g')
       .attr('class','axis')
-      .attr('transform',`translate(0,${h-xAxisOff})`)
+      .attr('transform',`translate(0,${h-xAxisOff+yMaxPad})`)
       .call(xAxis);
     yAxisGroup = svg.append('g')
       .attr('class','axis')
-      .attr('transform',`translate(${yAxisOff},0)`)
+      .attr('transform',`translate(${yAxisOff},${yMaxPad})`)
       .call(yAxis);
   })
 }
