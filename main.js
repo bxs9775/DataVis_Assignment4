@@ -122,14 +122,20 @@ function updateGraph() {
     .attr('fill',(d) => cScale(d.hours_of_sleep))
     .merge(bars)
     .transition('barsIn')
-    .duration(1000)
+    .duration(500)
     .attr('x',(d) => xScale(d.date))
     .attr('width',barWidth);
   bars.exit()
     .transition('barsOut')
-    .duration(1000)
+    .duration(500)
     .attr('x',(d) => -1*barWidth)
     .remove();
+  
+  xAxisGroup
+    .transition('xAxis')
+    .duration(500)
+    .call(xAxis);
+  
 }
 
 window.onload = function() {
