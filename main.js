@@ -83,7 +83,7 @@ function initGraph() {
       .attr('fill',(d) => cScale(d.hours_of_sleep));
     
     //Create axes
-    xAxis = d3.axisBottom(xScale);
+    xAxis = d3.axisBottom(xScale).tickFormat(d3.timeFormat('%a'));
     yAxis = d3.axisLeft(yScale);
     
     //Display axis
