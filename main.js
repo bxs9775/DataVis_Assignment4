@@ -101,6 +101,35 @@ function initGraph() {
 function updateGraph() {
   let numDays = numDaysSlider.value;
   daysText.innerText = numDays;
+  
+  var newData = dataset.slice(7-numDays,7);
+  console.dir(dataset);
+  console.dir(newData);
+  
+  var barWidth = w/numDays;
+  
+  //Update scales
+  xScale.domain([minDate(newData),maxDate(newData)]);
+  
+  //Update chart.
+  var bars = svg.selectAll('rect')
+    .data(newData,key);
+  bars.enter()
+    .append('rect')
+    .attr('x',(d) => -1*barWidth)
+    .attr('y',(d) => h - yScale(d.hours_of_sleep)-yMinPad)
+    .attr('height',(d) => yScale(d.hours_of_sleep))
+    .attr('fill',(d) => cScale(d.hours_of_sleep))
+    .merge(bars)
+    .transition('barsIn')
+    .duration(1000)
+    .attr('x',(d) => xScale(d.date))
+    .attr('width',barWidth);
+  bars.exit()
+    .transition('barsOut')
+    .duration(1000)
+    .attr('x',(d) => -1*barWidth)
+    .remove();
 }
 
 window.onload = function() {
