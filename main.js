@@ -6,6 +6,15 @@ let xScale, yScale, cScale;
 let xAxis, yAxis;
 let xAxisGroup, yAxisGroup;
 
+// axis offsets 
+// --- based on the size of the <g> elements
+var xAxisOff = 18.1; // based on the height of the <g> element
+var yAxisOff = 20; //based on the width of the <g> element
+
+//padding
+let xMinPad = yAxisOff;
+let yMinPad = xAxisOff;
+
 let numDaysSlider = document.querySelector("#numDaysSlider");
 let daysText = document.querySelector("#daysText");
 
@@ -46,27 +55,46 @@ function initGraph() {
     //Create scales
     xScale = d3.scaleTime()
       .domain([minDate(dataset),maxDate(dataset)])
-      .range([0,w]); //Note: add padding?
+      .range([xMinPad,w]); //Note: add padding?
     yScale = d3.scaleLinear()
       .domain([0,12])
-      .range([0,h]); //Note: add padding?
+      .range([0,h-yMinPad]); //Note: add padding?
     cScale = d3.scaleLinear()
       .domain([0,12])
       .range(['red','orange']);
     
     var defaultNum = 7;
     //Create bars
-    svg.selectAll('rect')
+    svg
+    /* I don't know why this doesn't work...
+      .append('g')
+      .attr('class','bars')
+      .attr('transform',`scale(1,-1) tanslate(0,${h})`)
+    */
+      .selectAll('rect')
       .data(dataset,key)
       .enter()
       .append('rect')
       .attr('x',(d) => xScale(d.date))
-      .attr('y',(d) => h - yScale(d.hours_of_sleep))
+      .attr('y',(d) => h - yScale(d.hours_of_sleep)-yMinPad)
+      //.attr('y',yMinPad)
       .attr('width',w/defaultNum)
       .attr('height',(d) => yScale(d.hours_of_sleep))
       .attr('fill',(d) => cScale(d.hours_of_sleep));
-    //Create axes
     
+    //Create axes
+    xAxis = d3.axisBottom(xScale);
+    yAxis = d3.axisLeft(yScale);
+    
+    //Display axis
+    xAxisGroup = svg.append('g')
+      .attr('class','axis')
+      .attr('transform',`translate(0,${h-xAxisOff})`)
+      .call(xAxis);
+    yAxisGroup = svg.append('g')
+      .attr('class','axis')
+      .attr('transform',`translate(${yAxisOff},0)`)
+      .call(yAxis);
   })
 }
 
